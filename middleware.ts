@@ -31,10 +31,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // if (!token && isProtectedRoute) {
-  //   url.pathname = '/auth/login';
-  //   return NextResponse.redirect(url);
-  // }
+  if (!token && isProtectedRoute) {
+    url.pathname = '/auth/login';
+    return NextResponse.redirect(url);
+  }
 
   if (token && isAuthPage) {
     url.pathname = '/dashboard';

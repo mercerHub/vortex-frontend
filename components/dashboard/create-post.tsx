@@ -7,15 +7,67 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { PenIcon, BriefcaseIcon } from 'lucide-react';
+import axiosInstance from '@/utils/api/axiosInstance';
+// Import the axios helper
 
 export function CreatePost() {
   const [postType, setPostType] = useState('article');
+  const [content, setContent] = useState('');
   const [jobDetails, setJobDetails] = useState({
     title: '',
     company: '',
     location: '',
     salary: '',
+    description: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const handlePostCreate = async () => {
+    try {
+      setIsSubmitting(true);
+      setError('');
+      
+      // Prepare the data based on post type
+      const postData = postType === 'article' 
+        ? { type: 'article', caption: content } 
+        : { 
+            type: 'job', 
+            caption: content,
+            job_details: jobDetails 
+          };
+      
+      // Send data to backend using axios helper
+      const response = await axiosInstance.post('/posts', postData).then((res) => res.data);
+
+      // Reset form after successful submission
+      if (postType === 'article') {
+        setContent('');
+      } else {
+        setJobDetails({
+          title: '',
+          company: '',
+          location: '',
+          salary: '',
+          description: ''
+        });
+      }
+      
+      // You could add a success message or redirect here
+      console.log('Post created successfully');
+      console.log(response)
+      
+    } catch (error) {
+      console.error('Error creating post:', error);
+      setError(error.response?.data?.message || 'Failed to create post');
+    } finally {
+      setIsSubmitting(false);
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
+  };
 
   return (
     <Card className="mb-6">
@@ -43,8 +95,15 @@ export function CreatePost() {
         </div>
       </CardHeader>
       <CardContent>
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+        
         {postType === 'article' ? (
-          <Textarea placeholder="Share your thoughts..." className="min-h-[100px] mb-4" />
+          <Textarea 
+            placeholder="Share your thoughts..." 
+            className="min-h-[100px] mb-4"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
         ) : (
           <div className="space-y-4">
             <Input
@@ -67,10 +126,21 @@ export function CreatePost() {
               value={jobDetails.salary}
               onChange={(e) => setJobDetails({ ...jobDetails, salary: e.target.value })}
             />
-            <Textarea placeholder="Job Description..." className="min-h-[100px]" />
+            <Textarea 
+              placeholder="Job Description..." 
+              className="min-h-[100px]"
+              value={jobDetails.description}
+              onChange={(e) => setJobDetails({ ...jobDetails, description: e.target.value })}
+            />
           </div>
         )}
-        <Button className="w-full mt-4">Post</Button>
+        <Button 
+          onClick={handlePostCreate} 
+          className="w-full mt-4"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Posting...' : 'Post'}
+        </Button>
       </CardContent>
     </Card>
   );

@@ -8,7 +8,7 @@ import { useRouter, usePathname } from 'next/navigation';
 const navigation = [
   { name: 'Home', href: '/dashboard', icon: HomeIcon },
   { name: 'My Profile', href: '/dashboard/profile', icon: UserIcon },
-  { name: 'Jobs', href: '/dashboard/jobs', icon: BriefcaseIcon },
+  { name: 'About me', href: '/dashboard/about-me', icon: BriefcaseIcon },
   { name: 'Network', href: '/dashboard/network', icon: UsersIcon },
   { name: 'Messages', href: '/dashboard/messages', icon: MessageSquareIcon },
   { name: 'Notifications', href: '/dashboard/notifications', icon: BellIcon },
